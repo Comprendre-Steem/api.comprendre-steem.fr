@@ -1,0 +1,45 @@
+<!-- import polymer-element -->
+<link rel="import"  href="https://polygit.org/components/polymer/polymer-element.html">
+<link rel="import"  href="https://polygit.org/components/polymer/lib/elements/dom-repeat.html">
+<link rel="import"  href="https://polygit.org/components/iron-input/iron-input.html">
+<link rel="import" 	href="https://polygit.org/components/iron-ajax/iron-ajax.html">
+
+<dom-module id="steem-mentions">
+  <template>
+  	<iron-ajax auto debounce-duration="300" url="http://localhost:8080/api/getMentions?username={{username}}" handle-as="json" last-response="{{ajaxResponse}}"></iron-ajax>
+    
+    <iron-input bind-value="{{username}}">
+      Mentions for <input is="iron-input" placeholder="Your username here..."> :
+    </iron-input>
+    
+    <p></p>
+    
+    <template is="dom-repeat" items="[[ajaxResponse.mentions]]">
+        <div>Author: <span>{{item.author}}</span></div>
+        <div>Title: <span>{{item.title}}</span></div>
+        <div>Permlink: <span>{{item.permlink}}</span></div>
+        <div>Created: <span>{{item.created}}</span></div>
+        <p></p>
+    </template>
+  </template>
+  <script>
+    class SteemMentions extends Polymer.Element {
+      static get is() { return "steem-mentions"; }
+      
+      static get properties() {
+          return {
+            username: {
+              type: String,
+              value: 'comprendre-steem'
+            }
+          };
+      }
+      
+      constructor() {
+        super();
+      }
+    }
+  customElements.define(SteemMentions.is, SteemMentions);
+  </script>
+
+</dom-module>
