@@ -39,7 +39,7 @@ public class Requester {
 	public static List<Mention> getMentions(String username, boolean includeComments, boolean includeOwnComments) throws SQLException {
 		List<Mention> articles = new ArrayList<>();
 		
-		String query = "SELECT author, title, url, created "
+		String query = "SELECT author, title, url, created, category "
 				+ "FROM Comments "
 				+ "(NOLOCK) "
 				+ "WHERE CONTAINS((title, body), '@%s') AND (title LIKE '%%@%s%%' OR body LIKE '%%@%s%%') "
@@ -58,7 +58,8 @@ public class Requester {
 				String title = rs.getString("title");
 				String permlink = rs.getString("url");
 				Date created = rs.getDate("created");
-				articles.add(new Mention(author, title, permlink, created));
+				String category = rs.getString("category");
+				articles.add(new Mention(author, title, permlink, created, category));
 			}
 		}
 		
