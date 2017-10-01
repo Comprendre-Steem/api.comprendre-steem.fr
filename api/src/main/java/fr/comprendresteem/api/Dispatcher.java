@@ -22,14 +22,19 @@ import fr.comprendresteem.model.Mention;
 @WebServlet("/getMentions")
 public class Dispatcher extends HttpServlet {
 	
-	public static final String USERNAME = "username";
+	private static final String USERNAME = "username";
+	private static final String COMMENTS = "comments";
+	private static final String OWN_COMMENTS = "own_comments";
 
     public Dispatcher() { }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		Map<String, String[]> params = request.getParameterMap();
 		
+		boolean includeComments = false;
+		boolean includeOwnComments = false;
 		List<String> usernames = Collections.emptyList();
+		
 		if (!params.containsKey(USERNAME)) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing parameter: " + USERNAME);
 			return;
@@ -37,8 +42,16 @@ public class Dispatcher extends HttpServlet {
 			usernames = Arrays.asList(params.get(USERNAME));
 		}
 		
+		if (params.containsKey(COMMENTS)) {
+			includeComments = Arrays.asList(params.get(COMMENTS)).get(0).equals("Y");
+		}
+		
+		if (params.containsKey(OWN_COMMENTS)) {
+			includeOwnComments = Arrays.asList(params.get(OWN_COMMENTS)).get(0).equals("Y");
+		}
+		
 		try {
-			List<Mention> articles = Requester.getMentions(usernames.get(0), false);
+			List<Mention> articles = Requester.getMentions(usernames.get(0), includeComments, includeOwnComments);
 			GetMentionsResponse data = new GetMentionsResponse(usernames.get(0), articles);
 			
 			response.setStatus(HttpServletResponse.SC_OK);

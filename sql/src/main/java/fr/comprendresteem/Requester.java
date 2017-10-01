@@ -36,7 +36,7 @@ public class Requester {
 		}
 	}
 	
-	public static List<Mention> getMentions(String username, boolean includeComments) throws SQLException {
+	public static List<Mention> getMentions(String username, boolean includeComments, boolean includeOwnComments) throws SQLException {
 		List<Mention> articles = new ArrayList<>();
 		
 		String query = "SELECT author, title, url, created "
@@ -44,10 +44,13 @@ public class Requester {
 				+ "(NOLOCK) "
 				+ "WHERE CONTAINS((title, body), '@%s') AND (title LIKE '%%@%s%%' OR body LIKE '%%@%s%%') "
 				+ "%s "
-				+ "AND author NOT IN ('%s') "
+				+ "%s "
 				+ "ORDER BY created DESC;";
 		
-		String sql = String.format(query, username, username, username, includeComments ? "" : "AND depth = 0", username);
+		String sql = String.format(query, username, username, username, 
+				includeComments ? "" : "AND depth = 0", 
+				includeOwnComments ? "" : "AND author NOT IN ('" + username +"')"
+			);
 		
 		try (PreparedStatement stat = getDb().prepareStatement(sql); ResultSet rs = stat.executeQuery()) {
 			while (rs.next()) {
