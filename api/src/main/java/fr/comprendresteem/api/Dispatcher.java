@@ -22,6 +22,8 @@ import fr.comprendresteem.model.Mention;
 @WebServlet("/getMentions")
 public class Dispatcher extends HttpServlet {
 	
+	private static final List<String> TRUE = Arrays.asList("Y", "true");
+	
 	private static final String USERNAME = "username";
 	private static final String COMMENTS = "comments";
 	private static final String OWN_COMMENTS = "own_comments";
@@ -43,11 +45,11 @@ public class Dispatcher extends HttpServlet {
 		}
 		
 		if (params.containsKey(COMMENTS)) {
-			includeComments = Arrays.asList(params.get(COMMENTS)).get(0).equals("Y");
+			includeComments = TRUE.contains(Arrays.asList(params.get(COMMENTS)).get(0));
 		}
 		
 		if (params.containsKey(OWN_COMMENTS)) {
-			includeOwnComments = Arrays.asList(params.get(OWN_COMMENTS)).get(0).equals("Y");
+			includeOwnComments = TRUE.contains(Arrays.asList(params.get(OWN_COMMENTS)).get(0));
 		}
 		
 		try {

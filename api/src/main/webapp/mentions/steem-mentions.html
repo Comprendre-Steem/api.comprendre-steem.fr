@@ -8,6 +8,7 @@
 <link rel="import" 	href="https://polygit.org/components/paper-slider/paper-slider.html">
 <link rel="import" 	href="https://polygit.org/components/paper-button/paper-button.html">
 <link rel="import" 	href="https://polygit.org/components/paper-input/paper-input.html">
+<link rel="import" 	href="https://polygit.org/components/paper-checkbox/paper-checkbox.html">
 <link rel="import" 	href="https://polygit.org/components/paper-icon-button/paper-icon-button.html">
 <link rel="import" 	href="https://polygit.org/components/paper-checkbox/paper-checkbox.html">
 <!-- import exmg data-table -->
@@ -79,15 +80,16 @@
 	  <exmg-toolbar>
           <div slot="default" class$="[[_computeSearchClasses(isSearch)]]">
             <template is="dom-if" if="[[isSearch]]" restamp="true">
-              <iron-icon icon="exmg-icons:search"></iron-icon>
+              @ <!--iron-icon icon="exmg-icons:search"></iron-icon-->
               <iron-input bind-value="{{username}}" >
                 <input id="searchInput" placeholder="[[this.placeHolder]]" value="{{value::input}}" on-keyup="_handleKeyUp" on-blur="_handleInputBlur">
               </iron-input>
             </template>
             <template is="dom-if" if="[[!isSearch]]" restamp="true">
-              <iron-icon icon="exmg-icons:search"></iron-icon>
+              @ <!--iron-icon icon="exmg-icons:search"></iron-icon-->
               <span class="interactive-content" on-tap="_showSearch">[[_getFilterValue(username)]]</span>
             </template>
+            <paper-checkbox checked="{{comments}}" on-tap="_search">Comments</paper-checkbox>
           </div>
         </exmg-toolbar>
         <!-- DataTable -->
@@ -128,7 +130,7 @@
       </paper-card>
 
       <!-- Load contacts from json file  -->
-      <iron-ajax id="ajax" url="http://api.comprendre-steem.fr/getMentions?username={{username}}" handle-as="json" last-response="{{rawItems}}"></iron-ajax>
+      <iron-ajax id="ajax" url="http://api.comprendre-steem.fr/getMentions?username={{username}}&comments={{!comments}}&own_comments={{!comments}}" handle-as="json" last-response="{{rawItems}}"></iron-ajax>
 
       <!-- Manage sorting and paging  -->
       <exmg-data-helper raw-items="[[rawItems.mentions]]" items="{{items}}" page-index="[[pageIndex]]" page-size="[[pageSize]]" sorted="[[sorted]]" sort-direction="[[sortDirection]]" total-items="{{totalItems}}"></exmg-data-helper>
@@ -162,11 +164,11 @@
             },
             isSearch: {
               type: Boolean,
-              value: false,
+              value: true,
             },
             placeHolder: {
               type: String,
-              value: 'Search admin user by name',
+              value: 'Search by username',
             }
           };
         }
@@ -201,6 +203,9 @@
         }
         _computeSearchClasses(isSearch) {
           return isSearch ? 'search' : '';
+        }
+        _search() {
+          this.$.ajax.generateRequest();
         }
 
     }
