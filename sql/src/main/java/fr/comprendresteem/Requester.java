@@ -8,30 +8,38 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import fr.comprendresteem.model.Mention;
+import fr.comprendresteem.model.Vote;
 
 public class Requester {
 
+	private static final String JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+	private static final String JDBC_URL = "jdbc:sqlserver://sql.steemsql.com;databaseName=DBSteem";
+	private static final String DB_USERNAME = "steemit";
+	private static final String DB_PASSWORD = "steemit";
+
 	private Requester() {
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			Class.forName(JDBC_DRIVER);
 		} catch (ClassNotFoundException e) {
-			// Should not happen
-			e.printStackTrace();
+			// Should not happen since driver is bundled in the application (see pom.xml)
+			Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(),e);
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
 	
 	private static Connection getDb() throws SQLException {
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			Connection db = DriverManager.getConnection("jdbc:sqlserver://sql.steemsql.com;databaseName=DBSteem","steemit","steemit");
+			Class.forName(JDBC_DRIVER);
+			Connection db = DriverManager.getConnection(JDBC_URL,DB_USERNAME,DB_PASSWORD);
 			db.setReadOnly(true);
 			return db;
 		} catch (ClassNotFoundException e) {
 			// Should not happen
-			e.printStackTrace();
+			Logger.getAnonymousLogger().log(Level.SEVERE, e.getMessage(),e);
 			throw new RuntimeException(e.getMessage(), e);
 		}
 	}
@@ -39,6 +47,7 @@ public class Requester {
 	public static List<Mention> getMentions(String username, boolean includeComments, boolean includeOwnComments) throws SQLException {
 		List<Mention> articles = new ArrayList<>();
 		
+		// TODO use PrepareStatement
 		String query = "SELECT author, root_title, title, url, created, category "
 				+ "FROM Comments "
 				+ "(NOLOCK) "
@@ -64,6 +73,44 @@ public class Requester {
 		}
 		
 		return articles;
+	}
+	
+	public static List<Vote> getIncomingVotes(String username, long offset, long limit) throws SQLException {
+		List<Vote> votes = new ArrayList<>();
+		
+		String sql = "SELECT author, voter, permlink, timestamp, weight "
+				+ "FROM TxVotes "
+				+ "(NOLOCK) "
+				+ "WHERE ID IN ("
+				+ "    SELECT MAX(ID) " 
+				+ "    FROM TxVotes " 
+				+ "    (NOLOCK) " 
+				+ "    WHERE author = ? " 
+				+ "    GROUP BY permlink, voter " 
+				+ ") "
+				+ "ORDER BY timestamp DESC "
+				+ "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY;";
+		
+		try (PreparedStatement stat = getDb().prepareStatement(sql)) {
+			int idx = 1;
+			stat.setString(idx++, username);
+			stat.setLong(idx++, offset);
+			stat.setLong(idx++, limit);
+			
+			try (ResultSet rs = stat.executeQuery()) {
+				while (rs.next()) {
+					String author = rs.getString("author");
+					String voter = rs.getString("voter");
+					String permlink = rs.getString("permlink");
+					Date timestamp = rs.getDate("timestamp");
+					double weight = rs.getDouble("weight") / 100.0;
+					
+					votes.add(new Vote(author, voter, permlink, timestamp, weight));
+				}
+			}
+		}
+		
+		return votes;
 	}
 	
 }

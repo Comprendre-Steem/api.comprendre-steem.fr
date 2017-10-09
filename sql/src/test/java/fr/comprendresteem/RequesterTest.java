@@ -19,4 +19,9 @@ public class RequesterTest {
 	public void including_ownComments() throws Exception {
 		Assert.assertTrue(Requester.getMentions("roxane", true, false).size() <= Requester.getMentions("roxane", true, true).size());
 	}
+	
+	@Test
+	public void incomingVotes() throws Exception {
+		Assert.assertEquals(20, Requester.getIncomingVotes("roxane", 10, 20).size());
+	}
 }
