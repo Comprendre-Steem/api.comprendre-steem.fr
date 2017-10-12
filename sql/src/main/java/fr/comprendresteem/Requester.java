@@ -66,7 +66,7 @@ public class Requester {
 				String author = rs.getString("author");
 				String title = rs.getString("root_title");
 				String permlink = rs.getString("url");
-				Date created = rs.getDate("created");
+				Date created = rs.getTimestamp("created");
 				String category = rs.getString("category");
 				articles.add(new Mention(author, title, permlink, created, category));
 			}
@@ -102,7 +102,7 @@ public class Requester {
 					String author = rs.getString("author");
 					String voter = rs.getString("voter");
 					String permlink = rs.getString("permlink");
-					Date timestamp = rs.getDate("timestamp");
+					Date timestamp = rs.getTimestamp("timestamp");
 					double weight = rs.getDouble("weight") / 100.0;
 					
 					votes.add(new Vote(author, voter, permlink, timestamp, weight));
