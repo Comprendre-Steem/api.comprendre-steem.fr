@@ -14,27 +14,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import fr.comprendresteem.Requester;
-import fr.comprendresteem.api.model.response.GetMentionsResponse;
-import fr.comprendresteem.model.Mention;
+import fr.comprendresteem.api.model.response.GetStatusResponse;
 
 @SuppressWarnings("serial")
-@WebServlet({"/getMentions", "/mentions"})
-public class GetMentions extends HttpServlet {
-	
-	private static final List<String> TRUE = Arrays.asList("Y", "true");
+@WebServlet({"/getStatus"})
+public class GetStatus extends HttpServlet {
 	
 	private static final String USERNAME = "username";
-	private static final String COMMENTS = "comments";
-	private static final String OWN_COMMENTS = "own_comments";
-
-    public GetMentions() { }
+	
+    public GetStatus() { }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> params = request.getParameterMap();
 		
-		boolean includeComments = false;
-		boolean includeOwnComments = false;
 		String username;
 		
 		if (!params.containsKey(USERNAME)) {
@@ -45,17 +38,9 @@ public class GetMentions extends HttpServlet {
 			username = usernames.get(0);
 		}
 		
-		if (params.containsKey(COMMENTS)) {
-			includeComments = TRUE.contains(Arrays.asList(params.get(COMMENTS)).get(0));
-		}
-		
-		if (params.containsKey(OWN_COMMENTS)) {
-			includeOwnComments = TRUE.contains(Arrays.asList(params.get(OWN_COMMENTS)).get(0));
-		}
-		
 		try {
-			List<Mention> articles = Requester.getMentions(username, includeComments, includeOwnComments);
-			GetMentionsResponse data = new GetMentionsResponse(username, articles);
+			Long totalIncomingVotes = Requester.getTotalIncomingVotes(username);
+			GetStatusResponse data = new GetStatusResponse(username, totalIncomingVotes);
 			
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/json");
@@ -68,4 +53,5 @@ public class GetMentions extends HttpServlet {
 			return;
 		}
 	}
+
 }

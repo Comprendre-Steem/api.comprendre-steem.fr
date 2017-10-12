@@ -113,4 +113,32 @@ public class Requester {
 		return votes;
 	}
 	
+	public static Long getTotalIncomingVotes(String username) throws SQLException {
+		Long total = -1L;
+		
+		String sql = "SELECT COUNT(*) "
+				+ "FROM TxVotes "
+				+ "(NOLOCK) "
+				+ "WHERE ID IN ("
+				+ "    SELECT MAX(ID) " 
+				+ "    FROM TxVotes " 
+				+ "    (NOLOCK) " 
+				+ "    WHERE author = ? " 
+				+ "    GROUP BY permlink, voter " 
+				+ ");";
+		
+		try (PreparedStatement stat = getDb().prepareStatement(sql)) {
+			int idx = 1;
+			stat.setString(idx++, username);
+			
+			try (ResultSet rs = stat.executeQuery()) {
+				if (rs.next()) {
+					total = rs.getLong(1);
+				}
+			}
+		}
+		
+		return total;
+	}
+	
 }
