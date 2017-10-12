@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import fr.comprendresteem.model.Mention;
+import fr.comprendresteem.model.Resteem;
 import fr.comprendresteem.model.Vote;
 
 public class Requester {
@@ -54,7 +55,8 @@ public class Requester {
 				+ "WHERE CONTAINS((title, body), '@%s') AND (title LIKE '%%@%s%%' OR body LIKE '%%@%s%%') "
 				+ "%s "
 				+ "%s "
-				+ "ORDER BY created DESC;";
+				+ "ORDER BY created DESC "
+				+ "OFFSET 0 ROWS FETCH NEXT 500 ROWS ONLY;";
 		
 		String sql = String.format(query, username, username, username, 
 				includeComments ? "" : "AND depth = 0", 
@@ -139,6 +141,35 @@ public class Requester {
 		}
 		
 		return total;
+	}
+	
+	public static List<Resteem> getResteem(String username) throws SQLException {
+		List<Resteem> resteem = new ArrayList<>();
+		
+		String sql = "SELECT * "
+				+ "FROM Reblogs "
+				+ "(NOLOCK) "
+				+ "WHERE author = ? "
+				+ "ORDER BY timestamp DESC "
+				+ "OFFSET 0 ROWS FETCH NEXT 500 ROWS ONLY;";
+		
+		try (PreparedStatement stat = getDb().prepareStatement(sql)) {
+			int idx = 1;
+			stat.setString(idx++, username);
+			
+			try (ResultSet rs = stat.executeQuery()) {
+				while (rs.next()) {
+					String author = rs.getString("author");
+					String account = rs.getString("account");
+					String permlink = rs.getString("permlink");
+					Date timestamp = rs.getTimestamp("timestamp");
+					
+					resteem.add(new Resteem(author, account, permlink, timestamp));
+				}
+			}
+		}
+		
+		return resteem;
 	}
 	
 }
