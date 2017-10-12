@@ -1,7 +1,7 @@
 package fr.comprendresteem.api;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +24,8 @@ public class GetIncomingVotes extends HttpServlet {
 	private static final String USERNAME = "username";
 	private static final String OFFSET = "offset";
 	private static final String LIMIT = "limit";
+	
+	private static final Long PAGE_MAX_SIZE = 9999L;
 
     public GetIncomingVotes() { }
 
@@ -53,7 +55,8 @@ public class GetIncomingVotes extends HttpServlet {
 		if (params.containsKey(LIMIT)) {
 			String value = Arrays.asList(params.get(LIMIT)).get(0);
 			if (isNumber(value)) {
-				limit = Long.valueOf(value);
+				Long userLimit = Long.valueOf(value);
+				limit = (userLimit < PAGE_MAX_SIZE) ? userLimit: PAGE_MAX_SIZE;
 			}
 		}
 		
@@ -64,7 +67,7 @@ public class GetIncomingVotes extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/json");
 			try (ServletOutputStream os = response.getOutputStream()) {
-				os.write(GsonConfig.GSON().toJson(data).getBytes(Charset.forName("UTF-8")));
+				os.write(GsonConfig.GSON().toJson(data).getBytes(StandardCharsets.UTF_8));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
