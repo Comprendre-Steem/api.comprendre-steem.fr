@@ -9,7 +9,7 @@ public class Vote {
 	public final String permlink;
 	public final Date timestamp;
 	public final double weight;
-	
+
 	public Vote(String author, String voter, String permlink, Date timestamp, double weight) {
 		super();
 		this.author = author;
@@ -22,11 +22,11 @@ public class Vote {
 	public String getUrl() {
 		return author + "/" + permlink;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Vote [author=" + author + ", voter=" + voter + ", permlink=" + permlink + ", timestamp=" + timestamp
 				+ ", weight=" + weight + "]";
 	}
-	
+
 }
