@@ -18,7 +18,7 @@ import fr.comprendresteem.api.model.response.GetMentionsResponse;
 import fr.comprendresteem.model.Mention;
 
 @SuppressWarnings("serial")
-@WebServlet({"/getMentions", "/mentions"})
+@WebServlet({"/getMentions"})
 public class GetMentions extends HttpServlet {
 	
 	private static final List<String> TRUE = Arrays.asList("Y", "true");

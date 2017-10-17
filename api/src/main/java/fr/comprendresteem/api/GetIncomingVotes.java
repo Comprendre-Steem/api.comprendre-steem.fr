@@ -18,7 +18,7 @@ import fr.comprendresteem.api.model.response.GetIncomingVotesResponse;
 import fr.comprendresteem.model.Vote;
 
 @SuppressWarnings("serial")
-@WebServlet({"/getIncomingVotes", "/votes-received"})
+@WebServlet({"/getIncomingVotes"})
 public class GetIncomingVotes extends HttpServlet {
 	
 	private static final String USERNAME = "username";
