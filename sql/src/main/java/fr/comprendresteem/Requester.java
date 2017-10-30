@@ -56,7 +56,7 @@ public class Requester {
 				+ "%s "
 				+ "%s "
 				+ "ORDER BY created DESC "
-				+ "OFFSET 0 ROWS FETCH NEXT 500 ROWS ONLY;";
+				+ "OFFSET 0 ROWS FETCH NEXT 2000 ROWS ONLY;";
 		
 		String sql = String.format(query, username, username, username, 
 				includeComments ? "" : "AND depth = 0", 
@@ -151,7 +151,7 @@ public class Requester {
 				+ "(NOLOCK) "
 				+ "WHERE author = ? "
 				+ "ORDER BY timestamp DESC "
-				+ "OFFSET 0 ROWS FETCH NEXT 500 ROWS ONLY;";
+				+ "OFFSET 0 ROWS FETCH NEXT 2000 ROWS ONLY;";
 		
 		try (PreparedStatement stat = getDb().prepareStatement(sql)) {
 			int idx = 1;
