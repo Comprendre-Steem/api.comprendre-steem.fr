@@ -18,8 +18,8 @@ import fr.comprendresteem.api.model.response.GetVotesResponse;
 import fr.comprendresteem.model.Vote;
 
 @SuppressWarnings("serial")
-@WebServlet({"/getIncomingVotes"})
-public class GetIncomingVotes extends HttpServlet {
+@WebServlet({"/getOutgoingVotes"})
+public class GetOutgoingVotes extends HttpServlet {
 	
 	private static final String USERNAME = "username";
 	private static final String OFFSET = "offset";
@@ -27,7 +27,7 @@ public class GetIncomingVotes extends HttpServlet {
 	
 	private static final Long PAGE_MAX_SIZE = 9999L;
 
-    public GetIncomingVotes() { }
+    public GetOutgoingVotes() { }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		@SuppressWarnings("unchecked")
@@ -61,7 +61,7 @@ public class GetIncomingVotes extends HttpServlet {
 		}
 		
 		try {
-			List<Vote> articles = Requester.getIncomingVotes(username, offset, limit);
+			List<Vote> articles = Requester.getOutgoingVotes(username, offset, limit);
 			GetVotesResponse data = new GetVotesResponse(username, articles);
 			
 			response.setStatus(HttpServletResponse.SC_OK);

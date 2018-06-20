@@ -14,27 +14,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import fr.comprendresteem.Requester;
-import fr.comprendresteem.api.model.response.GetVotesResponse;
-import fr.comprendresteem.model.Vote;
+import fr.comprendresteem.api.model.response.GetCommentsResponse;
+import fr.comprendresteem.model.Comment;
 
 @SuppressWarnings("serial")
-@WebServlet({"/getIncomingVotes"})
-public class GetIncomingVotes extends HttpServlet {
+@WebServlet({"/getComments"})
+public class GetComments extends HttpServlet {
 	
 	private static final String USERNAME = "username";
-	private static final String OFFSET = "offset";
-	private static final String LIMIT = "limit";
+	private static final String TIMELAPS = "days";
 	
-	private static final Long PAGE_MAX_SIZE = 9999L;
-
-    public GetIncomingVotes() { }
+    public GetComments() { }
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		int timelaps = 7;
+		
 		@SuppressWarnings("unchecked")
 		Map<String, String[]> params = request.getParameterMap();
 		
-		long offset = 0;
-		long limit = 30;
 		String username;
 		
 		if (!params.containsKey(USERNAME)) {
@@ -45,24 +43,13 @@ public class GetIncomingVotes extends HttpServlet {
 			username = usernames.get(0);
 		}
 		
-		if (params.containsKey(OFFSET)) {
-			String value = Arrays.asList(params.get(OFFSET)).get(0);
-			if (isNumber(value)) {
-				offset = Long.valueOf(value);
-			}
-		}
-		
-		if (params.containsKey(LIMIT)) {
-			String value = Arrays.asList(params.get(LIMIT)).get(0);
-			if (isNumber(value)) {
-				Long userLimit = Long.valueOf(value);
-				limit = (userLimit < PAGE_MAX_SIZE) ? userLimit: PAGE_MAX_SIZE;
-			}
+		if (params.containsKey(TIMELAPS)) {
+			timelaps = Integer.valueOf(Arrays.asList(params.get(TIMELAPS)).get(0));
 		}
 		
 		try {
-			List<Vote> articles = Requester.getIncomingVotes(username, offset, limit);
-			GetVotesResponse data = new GetVotesResponse(username, articles);
+			List<Comment> comments = Requester.getComments(username, timelaps);
+			GetCommentsResponse data = new GetCommentsResponse(username, comments);
 			
 			response.setStatus(HttpServletResponse.SC_OK);
 			response.setContentType("application/json");
@@ -76,7 +63,4 @@ public class GetIncomingVotes extends HttpServlet {
 		}
 	}
 
-	private boolean isNumber(String value) {
-		return value.matches("(\\d)*");
-	}
 }

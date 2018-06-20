@@ -7,7 +7,7 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Comprendre-Steem</name>
-	<url>http://www.informex.be/</url>
+	<url>http://www.comprendre-steem.fr/</url>
 
 	<parent>
 		<groupId>com.google.cloud.samples</groupId>
